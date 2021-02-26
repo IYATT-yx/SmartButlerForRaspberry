@@ -10,10 +10,13 @@ find_path(WIRINGPI_INCLUDE_DIRS NAMES wiringPi.h)
 
 # 自定义头文件路径
 include_directories(include)
+include_directories(oled_inc)
 # 二进制文件生成路径
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 # 获取源码的路径
 aux_source_directory(src src)
+aux_source_directory(main src)
+aux_source_directory(oled_src src)
 
 # 编译标准C++20和反馈参数
 add_compile_options(-std=c++20 -Wall -Werror -Wextra -pedantic -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wswitch-unreachable -Wswitch-enum -Wstringop-truncation -Wbool-compare -Wtautological-compare -Wfloat-equal -Wshadow=global -Wpointer-arith -Wpointer-compare -Wcast-align -Wcast-qual -Wwrite-strings -Wdangling-else -Wlogical-op -Wconversion -Wno-pedantic-ms-format)
