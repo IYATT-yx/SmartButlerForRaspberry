@@ -1,5 +1,8 @@
 # 树梅派智能贴身管家程序
 
+### 开源协议
+[GPLv3](https://a-rounder.com/license/GPLv3.txt)
+
 ### 基本信息
 硬件: YahBoom树梅派智能贴身管家(扩展板) + 0.96寸白色OLED(128x64)  
 树梅派: 4B 1.1 / 官方64-bit系统2020-8-24测试版  
