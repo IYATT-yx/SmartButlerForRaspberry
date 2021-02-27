@@ -14,20 +14,30 @@ extern "C"
     #include "wiringPiI2C.h"
     #include <sys/types.h>
     #include <unistd.h>
+    #include <sys/stat.h>
+    #include <sys/types.h>
+    #include <fcntl.h>
+    #include <sys/file.h>
 }
 #include <iostream>
 #include <cstdio>
 
 int main()
 {
+    // 使用文件锁防止重复运行本程序
+    int fileLock = open("/tmp/SmartButler.lock", O_CREAT | O_TRUNC);
+    if (flock(fileLock, LOCK_NB | LOCK_EX) == -1)
+    {
+        std::cerr << "重复运行!" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     // 向风扇传送温度数据的管道
     int fanPipe[2];
     // 向 RGB 传送温度数据的管道
     int rgbPipe[2];
-    // 向 oled 传送温度数据的管道
-    int oledPipe[2];
     // 创建管道
-    if (pipe(fanPipe) == -1 || pipe(rgbPipe) == -1 || pipe(oledPipe) == -1)
+    if (pipe(fanPipe) == -1 || pipe(rgbPipe) == -1)
     {
         exit(EXIT_FAILURE);
     }
@@ -35,9 +45,9 @@ int main()
     // 用于操作扩展板的句柄 - 初始化 - 需要传入扩展版的I2C地址 (使用 gpio i2cdetect 查询)
     int i2cFd = wiringPiI2CSetup(0x0D);
 
-    // 创建三个子进程
+    // 创建两个子进程
     int pCounter;   // 进程计数
-    for (pCounter = 0; pCounter < 3; ++pCounter)
+    for (pCounter = 0; pCounter < 2; ++pCounter)
     {
         // 禁止子进程再创建子进程
         if (fork() == 0)
@@ -95,21 +105,12 @@ int main()
 
         exit(EXIT_SUCCESS);
     }
-    // 第三个子进程控制 oled
-    else if (pCounter == 2)
-    {
-        // 读取温度数据,关闭写端
-        close(oledPipe[1]);
-
-        exit(EXIT_SUCCESS);
-    }
     // 父进程定时获取温度并发送给子进程
-    else if (pCounter == 3)
+    else if (pCounter == 2)
     {
         // 父进程负责向三个管道写数据,则关闭读端
         close(fanPipe[0]);
         close(rgbPipe[0]);
-        close(oledPipe[0]);
 
         // 实例化 CPU温度类
         InfoBase *cpuTemp = new CpuTemp;
@@ -143,7 +144,6 @@ int main()
             // 向子进程发送温度数据
             write(fanPipe[1], tempChar, sizeof(tempChar));
             write(rgbPipe[1], tempChar, sizeof(tempChar));
-            write(oledPipe[1], tempChar, sizeof(tempChar));
             // 调试 - CPU温度显示
             std::cout << "父进程: CPU温度: " << outVec[0] << std::endl;
             oled.clear();
