@@ -84,7 +84,7 @@ int main()
             std::cout << "风扇进程: 当前温度: " << cpuTempValue << " 上一次温度: " << lastCpuTempValue << std::endl;
 
             // 持续超温就启动风扇
-            if (cpuTempValue >= 50 && lastCpuTempValue >= 50)
+            if (cpuTempValue >= 45 && lastCpuTempValue >= 45)
             {
                 wiringPiI2CWriteReg8(i2cFd, 0x08, 0x01);
             }
