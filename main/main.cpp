@@ -21,6 +21,7 @@ extern "C"
 }
 #include <iostream>
 #include <cstdio>
+#include <ctime>
 
 int main()
 {
@@ -108,6 +109,17 @@ int main()
     // 父进程定时获取温度并发送给子进程
     else if (pCounter == 2)
     {
+        // 温控进程未设计 , 暂时使用下面代码 (彩虹灯)
+        wiringPiI2CWriteReg8(i2cFd, 0x04, 0x03);
+
+        // 暂存系统时钟
+        time_t now;
+        // 字符串时间
+        std::string timeStr;
+        // 时间结构
+        struct tm *timeStruct;
+
+
         // 父进程负责向三个管道写数据,则关闭读端
         close(fanPipe[0]);
         close(rgbPipe[0]);
@@ -123,6 +135,12 @@ int main()
         // 实例化oled
         Oled oled;
 
+        oled.clear();
+        oled.addString(2, 5, "Load......");
+        oled.addString(17, 20, "IYATT-yx");
+        oled.addString(5, 35, "2514374431@qq.com");
+        oled.show();
+
 
         // 储存字符型字符串温度
         char tempChar[4];
@@ -136,6 +154,16 @@ int main()
         while (true)
         {
             sleep(2);
+            oled.clear();
+
+            // 获取系统时间
+            time(&now);
+            // timeStr = ctime(&now);
+            timeStruct = localtime(&now);
+            timeStr = std::to_string(timeStruct->tm_hour) + " : " + std::to_string(timeStruct->tm_min) + " : " + std::to_string(timeStruct->tm_sec);
+            // 调试 - 时间显示
+            std::cout << timeStr << std::endl;
+            oled.addString(32, 32, timeStr);
 
             // 获取 CPU温度
             cpuTemp->getInfo(outVec);
@@ -146,7 +174,6 @@ int main()
             write(rgbPipe[1], tempChar, sizeof(tempChar));
             // 调试 - CPU温度显示
             std::cout << "父进程: CPU温度: " << outVec[0] << std::endl;
-            oled.clear();
             oled.addString(0, 0, "T= " + std::to_string(outVec[0]) + "C");
             // 清空
             outVec.clear();
@@ -188,9 +215,6 @@ int main()
 
             oled.show();
             std::cout << std::string(50, '+') << std::endl;
-
-            // 温控进程未设计 , 暂时使用下面代码 (彩虹灯)
-            wiringPiI2CWriteReg8(i2cFd, 0x04, 0x03);
         }
     }
 }
