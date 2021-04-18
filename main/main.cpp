@@ -81,9 +81,6 @@ int main()
             // 字符型温度转整数
             cpuTempValue = atol(tempChar);
 
-            // 调式 - 输出当前温度
-            std::cout << "风扇进程: 当前温度: " << cpuTempValue << " 上一次温度: " << lastCpuTempValue << std::endl;
-
             // 持续超温就启动风扇
             if (cpuTempValue >= 45 && lastCpuTempValue >= 45)
             {
@@ -137,8 +134,7 @@ int main()
 
         oled.clear();
         oled.addString(2, 5, "Load......");
-        oled.addString(17, 20, "IYATT-yx");
-        oled.addString(5, 35, "2514374431@qq.com");
+        oled.addString(17, 20, "iyatt.com");
         oled.show();
 
 
@@ -146,24 +142,25 @@ int main()
         char tempChar[4];
         // 传出参数
         std::vector<long> outVec;
-        // 控制周期计数 - 某些信息不需要频繁获取
+        // 控制周期计数
         int counter = 0;
         // IP
         std::string ip;
 
         while (true)
         {
-            sleep(2);
+            sleep(1);
             oled.clear();
-
-            // 获取系统时间
-            time(&now);
-            // timeStr = ctime(&now);
-            timeStruct = localtime(&now);
-            timeStr = std::to_string(timeStruct->tm_hour) + " : " + std::to_string(timeStruct->tm_min) + " : " + std::to_string(timeStruct->tm_sec);
-            // 调试 - 时间显示
-            std::cout << timeStr << std::endl;
-            oled.addString(32, 32, timeStr);
+            // 时间显示闪烁
+            if (counter % 2 == 0)
+            {
+                // 获取系统时间
+                time(&now);
+                // timeStr = ctime(&now);
+                timeStruct = localtime(&now);
+                timeStr = std::to_string(timeStruct->tm_hour) + " : " + std::to_string(timeStruct->tm_min);
+                oled.addString(48, 32, timeStr);
+            }
 
             // 获取 CPU温度
             cpuTemp->getInfo(outVec);
@@ -172,8 +169,6 @@ int main()
             // 向子进程发送温度数据
             write(fanPipe[1], tempChar, sizeof(tempChar));
             write(rgbPipe[1], tempChar, sizeof(tempChar));
-            // 调试 - CPU温度显示
-            std::cout << "父进程: CPU温度: " << outVec[0] << std::endl;
             oled.addString(0, 0, "T= " + std::to_string(outVec[0]) + "C");
             // 清空
             outVec.clear();
@@ -181,8 +176,6 @@ int main()
 
             // 获取 CPU使用率
             cpuUsage->getInfo(outVec);
-            // 调试 - CPU使用率
-            std::cout << "父进程: CPU使用率: " << outVec[0] << std::endl;
             oled.addString(64, 0, "CPU: " + std::to_string(outVec[0]) + "%");
             // 清空
             outVec.clear();
@@ -190,8 +183,6 @@ int main()
 
             // 获取内存和交换分区信息
             ramInfo->getInfo(outVec);
-            // 调试 - 终端输出
-            std::cout << "总内存: " << outVec[0] << " 可用内存: " << outVec[1] << std::endl;
             oled.addString(0, 8, "RAM: " + std::to_string(outVec[1]) + "/" + std::to_string(outVec[0]) + "MB");
             // 清空
             outVec.clear();
@@ -200,21 +191,18 @@ int main()
             {
                 // 获取IP
                 ip = ipInfo->getInfo(outVec);
-                // 调试 - 终端输出
-                std::cout << "父进程: " << ip << std::endl;
                 // 清空
                 outVec.clear();
             }
             ++counter;
-            // 控制周期, 2s * 15 = 30s
-            if (counter == 15)
+            // 控制周期, 3秒
+            if (counter == 3)
             {
                 counter = 0;
             }
             oled.addString(0, 16, ip);
 
             oled.show();
-            std::cout << std::string(50, '+') << std::endl;
         }
     }
 }

@@ -38,7 +38,7 @@ def install():
         sys.exit(1)
 
     # 构建二进制文件
-    os.system('make')
+    os.system('make -j4')
     os.chdir('..')
     if not(os.path.exists('bin/.SmartButler')):
         print('[build.py] 构建程序失败!')
@@ -60,10 +60,13 @@ def install():
     if not(os.path.exists('/home/pi/.config/autostart/SmartButler.desktop')):
         print('[build.py] 配置自启动失败!')
         sys.exit(1)
+
+    # 启动程序
+    os.system('/home/pi/.SmartButler&')
     
     print('[build.py] 部署完成,欢迎使用!')
     print(40 * '+')
-    print('author: IYATT-yx\nE-mail: 2514374431@qq.com\nsite: a-rounder.com')
+    print('author: IYATT-yx\nsite: iyatt.com')
     print(40 * '+')
 
 
@@ -78,7 +81,7 @@ def remove():
     
     print('[build.py] 移除成功,欢迎下次使用!')
     print(40 * '+')
-    print('author: IYATT-yx\nE-mail: 2514374431@qq.com\nsite: a-rounder.com')
+    print('author: IYATT-yx\nsite: iyatt.com')
     print(40 * '+')
 
 if __name__ == '__main__':
