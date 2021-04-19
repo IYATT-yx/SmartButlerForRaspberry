@@ -187,7 +187,7 @@ int main()
             // 清空
             outVec.clear();
 
-            if (counter == 0)
+            if (counter == 1)
             {
                 // 获取IP
                 ip = ipInfo->getInfo(outVec);
@@ -200,7 +200,15 @@ int main()
             {
                 counter = 0;
             }
-            oled.addString(0, 16, ip);
+            // 无网络连接时,提示
+            if (ip.empty())
+            {
+                oled.addString(0, 16, "Network: None");
+            }
+            else
+            {
+                oled.addString(0, 16, ip);
+            }
 
             oled.show();
         }
