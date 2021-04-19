@@ -78,6 +78,8 @@ def remove():
     if os.path.exists('/home/pi/.config/autostart/SmartButler.desktop'):
         os.remove('/home/pi/.config/autostart/SmartButler.desktop')
         print('[build.py] remove: /home/pi/.config/autostart/SmartButler.desktop')
+
+    os.remove('/tmp/SmartButler.lock')
     
     print('[build.py] 移除成功,欢迎下次使用!')
     print(40 * '+')
