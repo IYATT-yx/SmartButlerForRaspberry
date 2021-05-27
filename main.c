@@ -12,6 +12,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/file.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <stdlib.h>
 
 #if DEBUG
     #include <time.h>
@@ -19,6 +24,20 @@
 
 int main()
 {
+    /**
+     * 防重复运行，文件锁
+     */
+    int fileLock = open("/tmp/SmartButlerForRaspberry.lock", O_CREAT | O_TRUNC);
+    if (flock(fileLock, LOCK_NB | LOCK_EX) == -1)
+    {
+        #if DEBUG
+            printf("只允许一个运行的实例\n");
+        #endif
+
+        exit(EXIT_FAILURE);
+    }
+
+
     static int tem; // 温度值
     static int usage;   // 使用率值
     static IP ip;   // IP 信息结构
