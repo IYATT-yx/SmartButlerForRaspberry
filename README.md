@@ -24,6 +24,11 @@ cmake --build . --target install
 * wiringPi 库 64 位
 * YahBoom 树梅派风扇扩展版
 
+# 版本
+
+0.1、0.2 为 C++ 所写，也存在问题，运行一段时间后，会终止  
+目前 main 分支为最新的，改用 C 语言写，同时不再使用单独的 py 安装脚本，直接 cmake 构建的同时安装  
+
 # 版权
 Copyright (c) 2021 IYATT-yx  
 基于 [AGPL-3.0](LICENSE) 许可
