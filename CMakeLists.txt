@@ -1,28 +1,28 @@
-# 最低cmake版本
 cmake_minimum_required(VERSION 3.18)
 
-# 设置项目名称和语言
-project(SmartButlerForRaspberry CXX)
+project(SmartButlerForRaspberry)
 
-# 寻找wiringPi库
-find_library(WIRINGPI_LIBRARIES NAMES wiringPi)
-find_path(WIRINGPI_INCLUDE_DIRS NAMES wiringPi.h)
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
+    set(CMAKE_C_FLAGS "-no-pie -std=c17 -Wall -Werror -Wextra -pedantic -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wswitch-unreachable -Wswitch-enum -Wstringop-truncation -Wbool-compare -Wtautological-compare -Wfloat-equal -Wshadow=global -Wpointer-arith -Wpointer-compare -Wcast-align -Wcast-qual -Wwrite-strings -Wdangling-else -Wlogical-op -Wconversion -Wno-pedantic-ms-format")
 
-# 自定义头文件路径
-include_directories(include)
-include_directories(oled_inc)
-# 二进制文件生成路径
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-# 获取源码的路径
-aux_source_directory(src src)
-aux_source_directory(main src)
-aux_source_directory(oled_src src)
+    set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -D DEBUG")
+    set(CMAKE_C_FLAGS_RELEASE "-o2")
+    
+    set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/modules)
 
-# 编译标准C++20和反馈参数
-add_compile_options(-std=c++20 -Wall -Werror -Wextra -pedantic -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wswitch-unreachable -Wswitch-enum -Wstringop-truncation -Wbool-compare -Wtautological-compare -Wfloat-equal -Wshadow=global -Wpointer-arith -Wpointer-compare -Wcast-align -Wcast-qual -Wwrite-strings -Wdangling-else -Wlogical-op -Wconversion -Wno-pedantic-ms-format)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/modules)
 
-# 构建二进制文件
-add_executable(.SmartButler ${src})
+    include_directories(${CMAKE_SOURCE_DIR}/modules/oledLib/include)
+    include_directories(${CMAKE_SOURCE_DIR}/modules/getInformation/include)
 
-# 链接wiringPi库到二进制文件
-target_link_libraries(.SmartButler ${WIRINGPI_LIBRARIES})
+    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+    aux_source_directory(${CMAKE_SOURCE_DIR} src)
+    add_executable(.SmartButlerForRaspberry ${src})
+
+    target_link_libraries(.SmartButlerForRaspberry oledLib getInformation)
+
+    install(TARGETS .SmartButlerForRaspberry DESTINATION /home/pi/)
+    install(PROGRAMS SmartButlerForRaspberry.desktop DESTINATION /home/pi/.config/autostart/)
+else ()
+    message(FATAL_ERROR "不支持的编译环境")
+endif ()

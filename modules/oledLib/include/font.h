@@ -1,12 +1,12 @@
 /**
- * @copyright (c) 2021 IYATT-yx
- * @file font.hpp
- * @author IYATT-yx 2514374431@qq.com
- * @date 2021-2-26
- * @brief oled字体文件
+ * \file font.h
+ * \brief oled 字库
+ * \author IYATT-yx
+ * \copyright Copyright (C) 2021 IYATT-yx \n
+ * 基于 AGPL-3.0 许可
  */
-#ifndef FONT_HPP
-#define FONT_HPP
+#ifndef FONT_H
+#define FONT_H
 
 static const unsigned char font[] =
 {
