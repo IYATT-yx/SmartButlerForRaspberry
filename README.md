@@ -9,7 +9,7 @@ git clone https://github.com/IYATT-yx/SmartButlerForRaspberry --depth=1
 
 构建
 ```bash
-cd SmartButlerForRaspberry && mkdir build cd build
+cd SmartButlerForRaspberry && mkdir build && cd build
 
 cmake -DCMAKE_BUILD_TYPE=RELEASE ..
 
